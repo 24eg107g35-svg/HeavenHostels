@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     Bed,
@@ -23,7 +23,9 @@ import {
     ChevronRight,
     MapPin,
     Calendar,
-    Share2
+    Share2,
+    Filter,
+    Check
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -31,13 +33,36 @@ import api from '../api';
 import axios from 'axios';
 import './StudentRoomDetails.css';
 
+const defaultRoomsCatalogue = [
+    { id: 1, roomNumber: '101', capacity: 1, occupiedBeds: 1, monthlyRate: 7500, active: true, sharing: '1 Sharing', floor: '1st Floor' },
+    { id: 2, roomNumber: '102', capacity: 2, occupiedBeds: 1, monthlyRate: 7000, active: true, sharing: '2 Sharing', floor: '1st Floor' },
+    { id: 3, roomNumber: '103', capacity: 3, occupiedBeds: 2, monthlyRate: 6500, active: true, sharing: '3 Sharing', floor: '1st Floor' },
+    { id: 4, roomNumber: '104', capacity: 4, occupiedBeds: 3, monthlyRate: 6000, active: true, sharing: '4 Sharing', floor: '1st Floor' },
+    { id: 5, roomNumber: '105', capacity: 5, occupiedBeds: 4, monthlyRate: 5500, active: true, sharing: '5 Sharing', floor: '1st Floor' },
+    { id: 6, roomNumber: '201', capacity: 1, occupiedBeds: 0, monthlyRate: 7500, active: true, sharing: '1 Sharing', floor: '2nd Floor' },
+    { id: 7, roomNumber: '202', capacity: 2, occupiedBeds: 1, monthlyRate: 7000, active: true, sharing: '2 Sharing', floor: '2nd Floor' },
+    { id: 8, roomNumber: '203', capacity: 3, occupiedBeds: 2, monthlyRate: 6500, active: true, sharing: '3 Sharing', floor: '2nd Floor' },
+    { id: 9, roomNumber: '204', capacity: 4, occupiedBeds: 3, monthlyRate: 6000, active: true, sharing: '4 Sharing', floor: '2nd Floor' },
+    { id: 10, roomNumber: '205', capacity: 5, occupiedBeds: 3, monthlyRate: 5500, active: true, sharing: '5 Sharing', floor: '2nd Floor' },
+    { id: 11, roomNumber: '301', capacity: 2, occupiedBeds: 1, monthlyRate: 7000, active: true, sharing: '2 Sharing', floor: '3rd Floor' },
+    { id: 12, roomNumber: '302', capacity: 3, occupiedBeds: 2, monthlyRate: 6500, active: true, sharing: '3 Sharing', floor: '3rd Floor' },
+    { id: 13, roomNumber: '303', capacity: 4, occupiedBeds: 2, monthlyRate: 6000, active: true, sharing: '4 Sharing', floor: '3rd Floor' },
+    { id: 14, roomNumber: '304', capacity: 5, occupiedBeds: 3, monthlyRate: 5500, active: true, sharing: '5 Sharing', floor: '3rd Floor' }
+];
+
 const StudentRoomDetails = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const [roomData, setRoomData] = useState(null);
     const [studentProfile, setStudentProfile] = useState(null);
-    const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roommates' | 'amenities' | 'rules'
+    const [allRooms, setAllRooms] = useState(defaultRoomsCatalogue);
+    const [activeTab, setActiveTab] = useState('directory'); // 'directory' | 'overview' | 'amenities' | 'rules'
+
+    // Filters for directory tab
+    const [dirFloor, setDirFloor] = useState('ALL');
+    const [dirSharing, setDirSharing] = useState('ALL');
+    const [dirVacancy, setDirVacancy] = useState('ALL'); // ALL, VACANT
 
     const roomTypes = [
         {
@@ -108,23 +133,36 @@ const StudentRoomDetails = () => {
     useEffect(() => {
         const loadRoomData = async () => {
             const token = localStorage.getItem('Token');
-            if (!token) {
-                setIsLoggedIn(false);
+            const hasAuth = Boolean(token);
+            setIsLoggedIn(hasAuth);
+
+            // Fetch live room catalogue
+            try {
+                const catalogueRes = await axios.get(`${api}/api/rooms`, {
+                    params: { page: 0, size: 50 },
+                    withCredentials: true
+                });
+                if (catalogueRes.data && Array.isArray(catalogueRes.data.content) && catalogueRes.data.content.length > 0) {
+                    setAllRooms(catalogueRes.data.content);
+                }
+            } catch (catErr) {
+                console.warn('Could not load live room directory, using pre-populated catalogue:', catErr);
+            }
+
+            if (!hasAuth) {
                 setLoading(false);
                 return;
             }
 
-            setIsLoggedIn(true);
-
             try {
-                // 1. First try specialized /api/students/my-room endpoint
+                // 1. Try specialized /api/students/my-room endpoint
                 const roomRes = await axios.get(`${api}/api/students/my-room`, { withCredentials: true });
                 if (roomRes.data) {
                     setRoomData(roomRes.data);
                 }
             } catch (roomErr) {
                 console.warn('Could not load /api/students/my-room, falling back to profile:', roomErr);
-                
+
                 // Fallback: load student profile from /api/students/me
                 try {
                     const meRes = await axios.get(`${api}/api/students/me`, { withCredentials: true });
@@ -135,13 +173,13 @@ const StudentRoomDetails = () => {
                         const roomNum = student.roomNumber || student.RoomNumber;
                         const sharing = student.sharing || student.Sharing || "3 Sharing";
                         const amount = student.amountPerMonth || student.AmountPerMonth || "6500";
-                        
+
                         setRoomData({
                             hasRoom: true,
                             roomNumber: roomNum,
-                            capacity: parseInt(sharing) || 3,
+                            capacity: parseInt(sharing, 10) || 3,
                             occupiedBeds: 1,
-                            availableBeds: Math.max(0, (parseInt(sharing) || 3) - 1),
+                            availableBeds: Math.max(0, (parseInt(sharing, 10) || 3) - 1),
                             monthlyRate: amount,
                             active: true,
                             sharing: sharing.includes('Sharing') ? sharing : `${sharing} Sharing`,
@@ -168,6 +206,11 @@ const StudentRoomDetails = () => {
                     }
                 } catch (profileErr) {
                     console.error('Failed to load student profile for room details:', profileErr);
+                    setRoomData({
+                        hasRoom: false,
+                        roomNumber: "Not Assigned",
+                        status: "UNASSIGNED"
+                    });
                 }
             } finally {
                 setLoading(false);
@@ -176,6 +219,21 @@ const StudentRoomDetails = () => {
 
         loadRoomData();
     }, []);
+
+    // Filtered rooms directory
+    const filteredDirectory = useMemo(() => {
+        return allRooms.filter(room => {
+            const floor = room.roomNumber.startsWith('2') ? '2' : room.roomNumber.startsWith('3') ? '3' : '1';
+            const floorMatch = dirFloor === 'ALL' || dirFloor === floor;
+
+            const sharingMatch = dirSharing === 'ALL' || String(room.capacity) === dirSharing;
+
+            const available = Math.max(0, room.capacity - (room.occupiedBeds || 0));
+            const vacancyMatch = dirVacancy === 'ALL' || (dirVacancy === 'VACANT' && available > 0);
+
+            return floorMatch && sharingMatch && vacancyMatch;
+        });
+    }, [allRooms, dirFloor, dirSharing, dirVacancy]);
 
     return (
         <div className="room-details-page">
@@ -193,7 +251,7 @@ const StudentRoomDetails = () => {
                             Hostel <span className="text-gradient">Room Access</span>
                         </h1>
                         <p className="room-hero-subtitle">
-                            View comprehensive details about your room allotment, roommates, amenities, rules, and facilities at Heaven Boys Hostel.
+                            View comprehensive details about your room allotment, roommates, available hostel inventory, tariffs, and facilities at Heaven Boys Hostel.
                         </p>
 
                         {!isLoggedIn && (
@@ -258,7 +316,7 @@ const StudentRoomDetails = () => {
                                     </div>
                                     <div className="metric-box">
                                         <span className="metric-label">Monthly Rent</span>
-                                        <span className="metric-val">₹{roomData.monthlyRate || 6500}</span>
+                                        <span className="metric-val">₹{Number(roomData.monthlyRate || 6500).toLocaleString('en-IN')}</span>
                                         <span className="metric-sub">Per Month</span>
                                     </div>
                                     <div className="metric-box">
@@ -280,7 +338,7 @@ const StudentRoomDetails = () => {
                                             {roomData.roommates.map((roommate, idx) => (
                                                 <div key={idx} className="roommate-card">
                                                     <div className="roommate-avatar">
-                                                        {roommate.name.charAt(0).toUpperCase()}
+                                                        {(roommate.name || 'S').charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="roommate-info">
                                                         <h4>{roommate.name}</h4>
@@ -320,18 +378,24 @@ const StudentRoomDetails = () => {
                                 <AlertCircle size={28} className="text-amber-500" />
                                 <div>
                                     <h3>Room Allotment Pending</h3>
-                                    <p>You do not have a room assigned yet. Please contact the hostel administrator or warden to complete your room allotment.</p>
+                                    <p>You do not have a room assigned yet. Please explore the available rooms below or contact the hostel warden to complete your allotment.</p>
                                 </div>
-                                <button className="btn-contact-warden" onClick={() => alert("Please contact the Hostel Warden desk at +91 98765 43210 or visit the ground floor office.")}>
-                                    <Phone size={16} /> Contact Warden
+                                <button className="btn-contact-warden" onClick={() => setActiveTab('directory')}>
+                                    <Bed size={16} /> Browse Available Rooms
                                 </button>
                             </div>
                         )}
                     </section>
                 )}
 
-                {/* TABS NAVIGATION FOR OVERVIEW / AMENITIES / RULES */}
+                {/* TABS NAVIGATION */}
                 <div className="room-tabs">
+                    <button
+                        className={`tab-btn ${activeTab === 'directory' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('directory')}
+                    >
+                        <Home size={18} /> Hostel Rooms Directory ({allRooms.length})
+                    </button>
                     <button
                         className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
                         onClick={() => setActiveTab('overview')}
@@ -342,7 +406,7 @@ const StudentRoomDetails = () => {
                         className={`tab-btn ${activeTab === 'amenities' ? 'active' : ''}`}
                         onClick={() => setActiveTab('amenities')}
                     >
-                        <Sparkles size={18} /> Room Facilities & Amenities
+                        <Sparkles size={18} /> Facilities & Amenities
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'rules' ? 'active' : ''}`}
@@ -352,12 +416,170 @@ const StudentRoomDetails = () => {
                     </button>
                 </div>
 
+                {/* TAB 0: LIVE HOSTEL ROOMS DIRECTORY */}
+                {activeTab === 'directory' && (
+                    <section className="tab-pane">
+                        <div className="pane-intro">
+                            <h2>Heaven Boys Hostel - Rooms Directory & Bed Availability</h2>
+                            <p>Explore all available rooms across floors, check bed vacancies, and view approved monthly tariffs.</p>
+                        </div>
+
+                        {/* Directory Filters */}
+                        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24, background: '#fff', padding: 16, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <Filter size={16} style={{ color: '#64748b' }} />
+                                <span style={{ fontSize: 13, fontWeight: 700, color: '#475569' }}>Filter Rooms:</span>
+                            </div>
+
+                            <select 
+                                value={dirFloor} 
+                                onChange={(e) => setDirFloor(e.target.value)}
+                                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, background: '#fff', color: '#1e293b' }}
+                            >
+                                <option value="ALL">All Floors</option>
+                                <option value="1">1st Floor (101-105)</option>
+                                <option value="2">2nd Floor (201-205)</option>
+                                <option value="3">3rd Floor (301-304)</option>
+                            </select>
+
+                            <select 
+                                value={dirSharing} 
+                                onChange={(e) => setDirSharing(e.target.value)}
+                                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, background: '#fff', color: '#1e293b' }}
+                            >
+                                <option value="ALL">All Sharing Tiers</option>
+                                <option value="1">1 Sharing (₹7,500)</option>
+                                <option value="2">2 Sharing (₹7,000)</option>
+                                <option value="3">3 Sharing (₹6,500)</option>
+                                <option value="4">4 Sharing (₹6,000)</option>
+                                <option value="5">5 Sharing (₹5,500)</option>
+                            </select>
+
+                            <select 
+                                value={dirVacancy} 
+                                onChange={(e) => setDirVacancy(e.target.value)}
+                                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, background: '#fff', color: '#1e293b' }}
+                            >
+                                <option value="ALL">All Rooms</option>
+                                <option value="VACANT">Has Vacant Beds Only</option>
+                            </select>
+                        </div>
+
+                        {/* Room Directory Grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 20 }}>
+                            {filteredDirectory.map((room) => {
+                                const vacantBeds = Math.max(0, room.capacity - (room.occupiedBeds || 0));
+                                const isAllocatedToMe = roomData?.hasRoom && roomData?.roomNumber === room.roomNumber;
+                                const isFull = vacantBeds === 0;
+                                const floor = room.roomNumber.startsWith('2') ? '2nd Floor' : room.roomNumber.startsWith('3') ? '3rd Floor' : '1st Floor';
+
+                                return (
+                                    <div 
+                                        key={room.id || room.roomNumber} 
+                                        style={{
+                                            background: '#fff',
+                                            borderRadius: 14,
+                                            border: isAllocatedToMe ? '2px solid #3b82f6' : '1px solid #e2e8f0',
+                                            padding: 20,
+                                            boxShadow: isAllocatedToMe ? '0 10px 25px rgba(59, 130, 246, 0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
+                                            position: 'relative',
+                                            display: 'flex',
+                                            flexDirection: 'column'
+                                        }}
+                                    >
+                                        {isAllocatedToMe && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: -10,
+                                                right: 16,
+                                                background: '#2563eb',
+                                                color: '#fff',
+                                                fontSize: 11,
+                                                fontWeight: 800,
+                                                padding: '3px 10px',
+                                                borderRadius: 999
+                                            }}>
+                                                ★ Your Room
+                                            </div>
+                                        )}
+
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                                                    <span style={{ fontSize: 12, fontWeight: 800, color: '#64748b' }}>ROOM</span>
+                                                    <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a' }}>{room.roomNumber}</span>
+                                                </div>
+                                                <span style={{ fontSize: 13, color: '#64748b' }}>{floor}</span>
+                                            </div>
+                                            <span style={{
+                                                fontSize: 12,
+                                                fontWeight: 700,
+                                                padding: '4px 10px',
+                                                borderRadius: 999,
+                                                background: isFull ? '#f1f5f9' : '#ecfdf5',
+                                                color: isFull ? '#475569' : '#059669',
+                                                border: `1px solid ${isFull ? '#cbd5e1' : '#a7f3d0'}`
+                                            }}>
+                                                {isFull ? 'Full' : `${vacantBeds} Vacant Bed${vacantBeds > 1 ? 's' : ''}`}
+                                            </span>
+                                        </div>
+
+                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 12 }}>
+                                            <span style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>₹{Number(room.monthlyRate).toLocaleString('en-IN')}</span>
+                                            <span style={{ fontSize: 13, color: '#64748b' }}>/ month</span>
+                                            <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 600, color: '#2563eb', background: '#eff6ff', padding: '2px 8px', borderRadius: 4 }}>
+                                                {room.capacity} Sharing
+                                            </span>
+                                        </div>
+
+                                        {/* Occupancy bar */}
+                                        <div style={{ marginBottom: 16 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#64748b', marginBottom: 4 }}>
+                                                <span>Bed Capacity:</span>
+                                                <span><strong>{room.occupiedBeds || 0}</strong> / {room.capacity} Occupied</span>
+                                            </div>
+                                            <div style={{ height: 6, background: '#f1f5f9', borderRadius: 999, overflow: 'hidden' }}>
+                                                <div style={{
+                                                    height: '100%',
+                                                    width: `${Math.min(100, ((room.occupiedBeds || 0) / room.capacity) * 100)}%`,
+                                                    background: isFull ? '#64748b' : '#10b981',
+                                                    borderRadius: 999
+                                                }}></div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid #f1f5f9' }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => alert(`For room allotment in Room ${room.roomNumber} (${room.capacity} Sharing, ₹${room.monthlyRate}/month), please visit the Warden desk in Room 001 or call +91 98765 43210.`)}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '9px 12px',
+                                                    borderRadius: 8,
+                                                    border: '1px solid #cbd5e1',
+                                                    background: isAllocatedToMe ? '#eff6ff' : '#ffffff',
+                                                    color: isAllocatedToMe ? '#2563eb' : '#334155',
+                                                    fontWeight: 600,
+                                                    fontSize: 13,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {isAllocatedToMe ? '✓ Assigned to You' : 'Inquire / Request Allotment'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
                 {/* TAB 1: ROOM CATEGORIES & PRICING */}
                 {activeTab === 'overview' && (
                     <section className="tab-pane">
                         <div className="pane-intro">
-                            <h2>Standard Room Configurations</h2>
-                            <p>Explore the accommodation plans and room types available at Heaven Boys Hostel.</p>
+                            <h2>Approved Room Configurations & 1-5 Sharing Tariffs</h2>
+                            <p>Explore the official monthly pricing ladder for 1, 2, 3, 4, and 5 sharing accommodations.</p>
                         </div>
 
                         <div className="room-cards-grid">
@@ -394,21 +616,12 @@ const StudentRoomDetails = () => {
                                     </div>
 
                                     <div className="spec-footer">
-                                        {isLoggedIn ? (
-                                            <button 
-                                                className="btn-select-room"
-                                                onClick={() => navigate('/student/student-dashboard')}
-                                            >
-                                                View In My Dashboard <ChevronRight size={16} />
-                                            </button>
-                                        ) : (
-                                            <button 
-                                                className="btn-select-room"
-                                                onClick={() => navigate('/auth/login')}
-                                            >
-                                                Log In to Book <ChevronRight size={16} />
-                                            </button>
-                                        )}
+                                        <button 
+                                            className="btn-select-room"
+                                            onClick={() => setActiveTab('directory')}
+                                        >
+                                            View Available Rooms in Directory <ChevronRight size={16} />
+                                        </button>
                                     </div>
                                 </div>
                             ))}

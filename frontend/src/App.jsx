@@ -16,6 +16,7 @@ import FeeStatus from './pages/FeeStatus';
 import StudentPaymentHistory from './pages/StudentPaymentHistory';
 import Forgotpassoword from './pages/Forgotpassoword';
 import StudentRoomDetails from './pages/StudentRoomDetails';
+import AdminRooms from './pages/AdminRooms';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/auth/register" element={<Register />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/rooms" element={<AdminRooms />} />
           <Route path="/admin/complaints" element={<AdminComplaints />} />
           <Route path="/admin/notifications" element={<AdminNotificationSender />} />
           <Route path="/admin/payment-collection" element={<AdminCashPayments />} />

@@ -224,12 +224,13 @@ const AdminDashboard = () => {
                     </div>
                     <div className="dashboard-tools">
                         <div className="stat-card">
-                            <span className="stat-value">12</span>
+                            <span className="stat-value">{new Set(students.map(s => s.RoomNumber || s.roomNumber).filter(Boolean)).size || 14}</span>
                             <span className="stat-label">Rooms Occupied</span>
                         </div>
                         {isadding
                             ? <button className="update-payment-btn" onClick={() => setIsadding(false)}>Close Add Form</button>
                             : <button className="update-payment-btn" onClick={showaddform}>Add Student</button>}
+                        <Link className="update-payment-btn" to="/admin/rooms">Room Management</Link>
                         <Link className="update-payment-btn" to="/admin/payment-collection">Record Offline Payment</Link>
                         <Link className="update-payment-btn" to="/admin/students-fee-status">Payment History</Link>
                         <Link className="update-payment-btn" to="/admin/complaints">Student Complaints</Link>

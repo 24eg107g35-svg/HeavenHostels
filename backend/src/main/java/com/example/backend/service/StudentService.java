@@ -79,7 +79,7 @@ public class StudentService {
     public StudentRoomDetailResponse roomDetailsForAccount(Long accountId, String email) {
         Student student = (accountId != null ? students.findByAccountId(accountId) : java.util.Optional.<Student>empty())
                 .or(() -> students.findByEmailIgnoreCase(email != null ? email.trim() : ""))
-                .orElseThrow(() -> ApiException.notFound("Student profile not found"));
+                .orElse(null);
 
         List<String> amenities = List.of(
                 "High-Speed Wi-Fi (100 Mbps)",
@@ -93,6 +93,14 @@ public class StudentService {
         );
         String hostelName = "Heaven Boys Hostel";
         String wardenContact = "+91 98765 43210";
+
+        if (student == null) {
+            return new StudentRoomDetailResponse(
+                    false, null, "Not Assigned", 0, 0, 0,
+                    BigDecimal.ZERO, false, "Not Assigned",
+                    List.of(), amenities, hostelName, "Ground Floor", wardenContact, "UNASSIGNED"
+            );
+        }
 
         Room room = student.getRoom();
         String roomNumber = room != null ? room.getRoomNumber() : student.getRoomNumber();
@@ -227,14 +235,11 @@ public class StudentService {
 
         if (admin) {
             if (roomNumber != null && !roomNumber.isBlank()) {
-                Room roomSummary = rooms.findByRoomNumberIgnoreCase(roomNumber)
-                        .orElseThrow(() -> ApiException.badRequest("Create the room before assigning a student"));
-                Room room = rooms.findByIdForUpdate(roomSummary.getId()).orElseThrow(() ->
-                        ApiException.notFound("Room not found"));
+                Room roomSummary = rooms.findByRoomNumberIgnoreCase(roomNumber.trim())
+                        .orElseGet(() -> rooms.save(new Room(roomNumber.trim(), parseCapacity(student.getSharing()),
+                                monthlyRate != null ? monthlyRate : PaymentService.defaultPriceForSharing(student.getSharing()))));
+                Room room = rooms.findByIdForUpdate(roomSummary.getId()).orElse(roomSummary);
                 if (student.getRoom() == null || !student.getRoom().getId().equals(room.getId())) {
-                    if (!room.isActive() || students.countByRoomId(room.getId()) >= room.getCapacity()) {
-                        throw ApiException.conflict("Room has no available beds");
-                    }
                     student.setRoom(room);
                 }
             }

@@ -139,8 +139,14 @@ public class RoomService {
     }
 
     private RoomResponse view(Room room) {
-        long occupancy = room.getStudents().size();
+        long occupancy = room.getStudents() != null ? room.getStudents().size() : 0;
+        String floor = room.getRoomNumber() != null && room.getRoomNumber().startsWith("2") ? "2nd Floor" :
+                       room.getRoomNumber() != null && room.getRoomNumber().startsWith("3") ? "3rd Floor" : "1st Floor";
+        String sharing = room.getCapacity() + " Sharing";
+        List<String> names = room.getStudents() != null
+                ? room.getStudents().stream().map(Student::getStudentName).toList()
+                : List.of();
         return new RoomResponse(room.getId(), room.getRoomNumber(), room.getCapacity(), occupancy,
-                room.getMonthlyRate(), room.isActive());
+                room.getMonthlyRate(), room.isActive(), sharing, floor, names);
     }
 }

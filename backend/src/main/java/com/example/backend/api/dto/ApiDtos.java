@@ -60,8 +60,25 @@ public final class ApiDtos {
             LocalDate paymentDate,
             @Size(max = 120) String transactionId) {}
     public record PageResponse<T>(List<T> content, int page, int size, long totalElements, int totalPages) {}
-    public record RoomResponse(Long id, String roomNumber, int capacity, long occupiedBeds,
-                               BigDecimal monthlyRate, boolean active) {}
+    public record RoomResponse(
+            Long id,
+            String roomNumber,
+            int capacity,
+            long occupiedBeds,
+            BigDecimal monthlyRate,
+            boolean active,
+            String sharing,
+            String floor,
+            List<String> studentNames) {
+        public RoomResponse(Long id, String roomNumber, int capacity, long occupiedBeds,
+                            BigDecimal monthlyRate, boolean active) {
+            this(id, roomNumber, capacity, occupiedBeds, monthlyRate, active,
+                    capacity + " Sharing",
+                    roomNumber != null && roomNumber.startsWith("2") ? "2nd Floor" :
+                    roomNumber != null && roomNumber.startsWith("3") ? "3rd Floor" : "1st Floor",
+                    List.of());
+        }
+    }
     public record DashboardResponse(long totalStudents, long activeStudents, long totalRooms,
                                     long occupiedRooms, long availableRooms, long paidThisMonth,
                                     long unpaidThisMonth, BigDecimal revenueThisMonth) {}

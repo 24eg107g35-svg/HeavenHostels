@@ -28,7 +28,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/rooms")
-@PreAuthorize("hasRole('ADMIN')")
 @SecurityRequirement(name = "bearerAuth")
 public class RoomController {
     private final RoomService rooms;
@@ -41,6 +40,7 @@ public class RoomController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public RoomResponse create(@Valid @RequestBody RoomRequest request,
                                @AuthenticationPrincipal AuthenticatedUser actor) {
         return rooms.create(request, actor.email());
@@ -48,7 +48,7 @@ public class RoomController {
 
     @GetMapping
     public PageResponse<RoomResponse> list(@RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "20") int size) {
+                                            @RequestParam(defaultValue = "100") int size) {
         validatePage(page, size);
         return rooms.list(page, size, null);
     }
@@ -61,6 +61,7 @@ public class RoomController {
     }
 
     @GetMapping("/occupied")
+    @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<RoomResponse> occupied(@RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "20") int size) {
         validatePage(page, size);
@@ -73,6 +74,7 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoomResponse update(@PathVariable Long id, @Valid @RequestBody RoomRequest request,
                                @AuthenticationPrincipal AuthenticatedUser actor) {
         return rooms.update(id, request, actor.email());
@@ -80,6 +82,7 @@ public class RoomController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser actor) {
         rooms.delete(id, actor.email());
     }
@@ -92,6 +95,7 @@ public class RoomController {
 
     @PostMapping("/{roomId}/assign/{studentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void assign(@PathVariable Long roomId, @PathVariable Long studentId,
                        @AuthenticationPrincipal AuthenticatedUser actor) {
         rooms.assign(roomId, studentId, actor.email());
@@ -99,6 +103,7 @@ public class RoomController {
 
     @PostMapping("/{roomId}/remove/{studentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void remove(@PathVariable Long roomId, @PathVariable Long studentId,
                        @AuthenticationPrincipal AuthenticatedUser actor) {
         rooms.remove(roomId, studentId, actor.email());
