@@ -15,8 +15,10 @@ import {
     ShieldCheck,
     ArrowRight,
     Menu,
-    LogOut
+    LogOut,
+    Bed
 } from 'lucide-react';
+
  import Footer from '../components/Footer';
 import './StudentDashboard.css';
 import Navbar from '../components/Navbar';
@@ -191,10 +193,10 @@ const StudentDashboard = () => {
 
                         </div>
                         <div className="sd-stats">
-                            <div className="sd-card">
+                            <Link to="/student/room-details" className="sd-card" style={{ textDecoration: 'none', color: 'inherit' }} title="Click to view Room Details">
                                 <div className="value">{studentData.roomNo}</div>
-                                <div className="label">Room No</div>
-                            </div>
+                                <div className="label">Room No ↗</div>
+                            </Link>
                             <div className="sd-card">
                                 <div>
                                     <span className={`text-sm font-black px-3 py-1 inline-block ${studentData.paymentStatus === 'Paid' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'} uppercase tracking-widest rounded-full`}>
@@ -255,12 +257,14 @@ const StudentDashboard = () => {
 
                     <div className="sd-quick-actions">
                         {[
+                            { title: "Room Access", desc: "View room allotment & roommates", icon: <Bed />, color: "bg-emerald-400", link: "/student/room-details" },
                             { title: "Fee Management", desc: "Current month dues and payment", icon: <CreditCard />, color: "bg-purple-400", link: "/student/fee-management" },
                             { title: "Raise Complaint", desc: "Maintenance & room issues", icon: <MessageSquare />, color: "bg-amber-400", link: "/student/raise-complaint" },
                             { title: "Mess Menu", desc: "Weekly food schedule", icon: <Utensils />, color: "bg-blue-400", link: "/student/mess-menu" },
                             { title: "Notifications", desc: "Hostel updates and alerts", icon: <Bell />, color: "bg-amber-400", link: "/student/notifications", unreadCount: unreadNotificationCount },
                             { title: "Payment History", desc: "Receipts & transactions", icon: <CreditCard />, color: "bg-purple-400", link: "/student/fee-history" }
                         ].map((action, idx) => (
+
                             <Link key={idx} to={action.link} className="action-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <div className={`icon ${action.color} p-3`} style={{ position: 'relative' }}>
                                     {action.icon}

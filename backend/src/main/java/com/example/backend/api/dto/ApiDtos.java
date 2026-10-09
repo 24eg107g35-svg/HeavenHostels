@@ -122,4 +122,28 @@ public final class ApiDtos {
             BigDecimal Amount,
             List<PaymentResponse> payments) {}
     public record UserResponse(Long id, String email, String role) {}
+    public record RoommateResponse(
+            Long id,
+            String name,
+            String courseAndYear,
+            String collegeName,
+            String email,
+            String mobileNumber) {}
+    public record StudentRoomDetailResponse(
+            boolean hasRoom,
+            Long roomId,
+            String roomNumber,
+            int capacity,
+            long occupiedBeds,
+            long availableBeds,
+            BigDecimal monthlyRate,
+            boolean active,
+            String sharing,
+            List<RoommateResponse> roommates,
+            List<String> amenities,
+            String hostelName,
+            String floor,
+            String wardenContact,
+            String status) {}
 }
+

@@ -5,7 +5,7 @@ import './Features.css';
 
 const Features = () => {
     const features = [
-        { icon: <Bed size={24} />, title: 'Room Access', desc: 'You Can Access Your Room Details.', route: '/student/student-dashboard' },
+        { icon: <Bed size={24} />, title: 'Room Access', desc: 'You Can Access Your Room Details.', route: '/student/room-details' },
         { icon: <CreditCard size={24} />, title: 'Fee Management', desc: 'You Can Track Your Payment Recipts.', route: '/student/fee-management' },
         { icon: <Utensils size={24} />, title: 'Mess Management', desc: 'You Can Track Your Mess Details.', route: '/student/mess-menu' },
         { icon: <MessageSquareWarning size={24} />, title: 'Complaints', desc: 'You Can Raise Your Complaints.', route: '/student/raise-complaint' },

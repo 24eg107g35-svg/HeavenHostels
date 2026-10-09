@@ -4,6 +4,7 @@ import com.example.backend.api.dto.ApiDtos.PageResponse;
 import com.example.backend.api.dto.ApiDtos.RegisterRequest;
 import com.example.backend.api.dto.ApiDtos.StudentRequest;
 import com.example.backend.api.dto.ApiDtos.StudentResponse;
+import com.example.backend.api.dto.ApiDtos.StudentRoomDetailResponse;
 import com.example.backend.api.dto.ApiDtos.UserResponse;
 import com.example.backend.domain.Role;
 import com.example.backend.domain.UserAccount;
@@ -75,6 +76,12 @@ public class StudentController {
     @SecurityRequirement(name = "bearerAuth")
     public StudentResponse me(@AuthenticationPrincipal AuthenticatedUser principal) {
         return students.byEmail(principal.email());
+    }
+
+    @GetMapping("/my-room")
+    @SecurityRequirement(name = "bearerAuth")
+    public StudentRoomDetailResponse myRoom(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return students.roomDetailsForAccount(principal.id(), principal.email());
     }
 
     @PostMapping("/addnewstudent")

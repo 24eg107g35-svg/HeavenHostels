@@ -3,6 +3,8 @@ package com.example.backend.service;
 import com.example.backend.api.dto.ApiDtos.PageResponse;
 import com.example.backend.api.dto.ApiDtos.StudentRequest;
 import com.example.backend.api.dto.ApiDtos.StudentResponse;
+import com.example.backend.api.dto.ApiDtos.RoommateResponse;
+import com.example.backend.api.dto.ApiDtos.StudentRoomDetailResponse;
 import com.example.backend.domain.Payment;
 import com.example.backend.domain.PaymentStatus;
 import com.example.backend.domain.Room;
@@ -72,6 +74,100 @@ public class StudentService {
         return students.findByRoomIdAndIdNotOrderByStudentNameAsc(student.getRoom().getId(), student.getId())
                 .stream().map(Student::getStudentName).toList();
     }
+
+    @Transactional(readOnly = true)
+    public StudentRoomDetailResponse roomDetailsForAccount(Long accountId, String email) {
+        Student student = (accountId != null ? students.findByAccountId(accountId) : java.util.Optional.<Student>empty())
+                .or(() -> students.findByEmailIgnoreCase(email != null ? email.trim() : ""))
+                .orElseThrow(() -> ApiException.notFound("Student profile not found"));
+
+        List<String> amenities = List.of(
+                "High-Speed Wi-Fi (100 Mbps)",
+                "24/7 Running Water & Hot Geyser",
+                "Study Table & Ergonomic Chair",
+                "Steel Wardrobe & Private Locker",
+                "Attached Washroom with Exhaust",
+                "Daily Room Cleaning & Housekeeping",
+                "Uninterrupted Power Backup (Inverter)",
+                "RO Purified Chilled Drinking Water"
+        );
+        String hostelName = "Heaven Boys Hostel";
+        String wardenContact = "+91 98765 43210";
+
+        Room room = student.getRoom();
+        String roomNumber = room != null ? room.getRoomNumber() : student.getRoomNumber();
+
+        if (room == null && roomNumber != null && !roomNumber.isBlank()) {
+            room = rooms.findByRoomNumberIgnoreCase(roomNumber.trim()).orElse(null);
+        }
+
+        if (roomNumber == null || roomNumber.isBlank()) {
+            return new StudentRoomDetailResponse(
+                    false, null, "Not Assigned", 0, 0, 0,
+                    student.getAmountPerMonth(), false, "Not Assigned",
+                    List.of(), amenities, hostelName, "N/A", wardenContact, "UNASSIGNED"
+            );
+        }
+
+        Long roomId = room != null ? room.getId() : null;
+        int capacity = room != null ? room.getCapacity() : parseCapacity(student.getSharing());
+        long occupiedBeds = roomId != null ? students.countByRoomId(roomId)
+                : students.findByRoomNumberOrderByStudentNameAsc(roomNumber).size();
+        long availableBeds = Math.max(0, capacity - occupiedBeds);
+        BigDecimal rate = room != null && room.getMonthlyRate().compareTo(BigDecimal.ZERO) > 0
+                ? room.getMonthlyRate()
+                : student.getAmountPerMonth();
+        boolean active = room == null || room.isActive();
+        String sharingStr = student.getSharing() != null && !student.getSharing().isBlank()
+                ? (student.getSharing().toLowerCase(Locale.ROOT).contains("sharing") ? student.getSharing() : student.getSharing() + " Sharing")
+                : (capacity + " Sharing");
+
+        List<Student> rawRoommates = roomId != null
+                ? students.findByRoomIdAndIdNotOrderByStudentNameAsc(roomId, student.getId())
+                : students.findByRoomNumberOrderByStudentNameAsc(roomNumber).stream()
+                        .filter(s -> !s.getId().equals(student.getId())).toList();
+
+        List<RoommateResponse> roommates = rawRoommates.stream()
+                .map(r -> new RoommateResponse(
+                        r.getId(),
+                        r.getStudentName(),
+                        r.getCourseNameAndYear() != null ? r.getCourseNameAndYear() : "Student",
+                        r.getCollegeName() != null ? r.getCollegeName() : "N/A",
+                        r.getEmail(),
+                        r.getMobileNumber() != null ? r.getMobileNumber() : "N/A"
+                ))
+                .toList();
+
+        String floor = determineFloor(roomNumber);
+
+        return new StudentRoomDetailResponse(
+                true, roomId, roomNumber, capacity, occupiedBeds, availableBeds,
+                rate, active, sharingStr, roommates, amenities, hostelName, floor, wardenContact, "ACTIVE"
+        );
+    }
+
+    private int parseCapacity(String sharing) {
+        if (sharing == null) return 3;
+        try {
+            String digits = sharing.replaceAll("[^0-9]", "");
+            return digits.isEmpty() ? 3 : Integer.parseInt(digits);
+        } catch (Exception e) {
+            return 3;
+        }
+    }
+
+    private String determineFloor(String roomNumber) {
+        if (roomNumber == null || roomNumber.isEmpty()) return "Ground Floor";
+        char first = roomNumber.charAt(0);
+        return switch (first) {
+            case '1' -> "1st Floor";
+            case '2' -> "2nd Floor";
+            case '3' -> "3rd Floor";
+            case '4' -> "4th Floor";
+            default -> "Ground Floor";
+        };
+    }
+
 
     @Transactional(readOnly = true)
     public List<StudentResponse> byRoom(String roomNumber) {

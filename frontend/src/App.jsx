@@ -15,6 +15,7 @@ import StudentNotifications from './pages/StudentNotifications';
 import FeeStatus from './pages/FeeStatus';
 import StudentPaymentHistory from './pages/StudentPaymentHistory';
 import Forgotpassoword from './pages/Forgotpassoword';
+import StudentRoomDetails from './pages/StudentRoomDetails';
 import './App.css';
 
 function App() {
@@ -32,6 +33,10 @@ function App() {
           <Route path="/admin/notifications" element={<AdminNotificationSender />} />
           <Route path="/admin/payment-collection" element={<AdminCashPayments />} />
           <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/student/room-details" element={<StudentRoomDetails />} />
+          <Route path="/student/room-access" element={<StudentRoomDetails />} />
+          <Route path="/room-details" element={<StudentRoomDetails />} />
+          <Route path="/room-access" element={<StudentRoomDetails />} />
           <Route path="/student/fee-management" element={<StudentFeeManagement />} />
           <Route path="/student/raise-complaint" element={<StudentComplaint />} />
           <Route path="/student/mess-menu" element={<StudentMessMenu />} />

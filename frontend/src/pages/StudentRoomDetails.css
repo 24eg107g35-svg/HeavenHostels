@@ -1,0 +1,882 @@
+/* Room Details Page Styling */
+
+.room-details-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: inherit;
+}
+
+/* HERO SECTION */
+.room-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+    color: #ffffff;
+    padding: 60px 0 45px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.room-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+.room-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.room-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(99, 102, 241, 0.18);
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #a5b4fc;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.room-hero-title {
+    font-size: 2.75rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 14px;
+}
+
+.room-hero-subtitle {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* GUEST LOGIN PROMPT BANNER */
+.login-prompt-banner {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.login-prompt-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+.prompt-icon {
+    color: #38bdf8;
+    flex-shrink: 0;
+}
+
+.btn-login-prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-login-prompt:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+/* MAIN CONTENT */
+.room-main-content {
+    flex: 1;
+    padding: 40px 16px 60px 16px;
+}
+
+/* ALLOCATED ROOM CARD */
+.allocated-room-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.allocated-room-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #06b6d4, #10b981);
+}
+
+.card-top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.room-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.room-number-badge {
+    background: #1e1b4b;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    box-shadow: 0 4px 12px rgba(30, 27, 75, 0.2);
+}
+
+.badge-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #a5b4fc;
+}
+
+.badge-num {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.allotted-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.allotted-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 4px 0 0 0;
+}
+
+.allotted-tags {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tag-status.active {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tag-sharing {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* METRICS GRID */
+.room-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.metric-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.metric-val.text-primary {
+    color: #4f46e5;
+}
+
+.metric-val.text-sm {
+    font-size: 16px;
+}
+
+.metric-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* ROOMMATES SUBSECTION */
+.roommates-block {
+    margin-bottom: 28px;
+    background: #fafafa;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.block-header h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.roommates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.roommate-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.roommate-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #818cf8);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.roommate-info h4 {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.roommate-course {
+    margin: 0;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.roommate-college {
+    margin: 0;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.roommate-contact {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #4f46e5;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.empty-roommates-notice {
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* QUICK ACTIONS BAR */
+.room-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-action.complaint {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.btn-action.complaint:hover {
+    background: #fde68a;
+}
+
+.btn-action.fee {
+    background: #ede9fe;
+    color: #5b21b6;
+    border: 1px solid #ddd6fe;
+}
+
+.btn-action.fee:hover {
+    background: #ddd6fe;
+}
+
+.btn-action.mess {
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid #bae6fd;
+}
+
+.btn-action.mess:hover {
+    background: #bae6fd;
+}
+
+/* NO ROOM ALLOTTED BANNER */
+.no-room-banner {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.no-room-banner h3 {
+    margin: 0 0 4px 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #92400e;
+}
+
+.no-room-banner p {
+    margin: 0;
+    font-size: 13px;
+    color: #b45309;
+}
+
+.btn-contact-warden {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #d97706;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* TABS NAVIGATION */
+.room-tabs {
+    display: flex;
+    gap: 8px;
+    background: #e2e8f0;
+    padding: 6px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #475569;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: #ffffff;
+    color: #1e1b4b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tab-btn:hover:not(.active) {
+    color: #0f172a;
+}
+
+/* PANE INTRO */
+.pane-intro {
+    margin-bottom: 24px;
+}
+
+.pane-intro h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+}
+
+.pane-intro p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* TAB 1: ROOM CARDS GRID */
+.room-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.room-spec-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.room-spec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.room-spec-card.featured {
+    border: 2px solid #6366f1;
+    box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.15);
+}
+
+.featured-ribbon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #6366f1;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.spec-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.spec-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.spec-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.spec-sharing {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.spec-price {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.price-num {
+    font-size: 26px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.price-period {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.spec-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    flex-grow: 0;
+}
+
+.spec-amenities-list {
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
+
+.spec-amenities-list h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+.spec-amenities-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.spec-amenities-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #334155;
+}
+
+.check-icon {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.spec-footer {
+    margin-top: auto;
+}
+
+.btn-select-room {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-select-room:hover {
+    background: #4f46e5;
+}
+
+/* TAB 2: AMENITIES FEATURES GRID */
+.amenities-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.amenity-feature-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.amenity-feature-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+}
+
+.amenity-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.amenity-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.amenity-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* TAB 3: RULES CARDS GRID */
+.rules-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.rule-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.rule-time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.rule-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+}
+
+.rule-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* WARDEN DESK CARD */
+.warden-desk-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 24px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.warden-desk-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.warden-desk-info h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+}
+
+.warden-desk-info p {
+    font-size: 13px;
+    color: #cbd5e1;
+    margin: 0;
+}
+
+.warden-desk-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-call-warden {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #1e1b4b;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-call-warden:hover {
+    background: #f1f5f9;
+}
+
+.btn-file-ticket {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-file-ticket:hover {
+    background: #4338ca;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 768px) {
+    .room-hero-title {
+        font-size: 2rem;
+    }
+
+    .login-prompt-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-login-prompt {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .card-top-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .warden-desk-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .warden-desk-buttons {
+        width: 100%;
+    }
+
+    .btn-call-warden, .btn-file-ticket {
+        width: 100%;
+        justify-content: center;
+    }
+}
