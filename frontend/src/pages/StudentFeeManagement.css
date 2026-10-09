@@ -1,0 +1,507 @@
+/* Student Fee Management Styles */
+
+.fee-page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.fee-main {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+}
+
+/* HEADER SECTION */
+.fee-header-card {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 36px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.fee-header-card::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.fee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c7d2fe;
+  margin-bottom: 14px;
+}
+
+.fee-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.02em;
+}
+
+.fee-subtitle {
+  font-size: 1rem;
+  color: #cbd5e1;
+  margin: 0;
+  max-width: 650px;
+  line-height: 1.5;
+}
+
+/* SHARING PRICING TIERS SECTION */
+.sharing-pricing-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-head h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-head p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.sharing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.sharing-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sharing-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sharing-card.active-tier {
+  border: 2px solid #4f46e5;
+  background: #eef2ff;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.15);
+}
+
+.your-tier-badge {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4f46e5;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.sharing-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.sharing-price {
+  font-size: 22px;
+  font-weight: 900;
+  color: #4f46e5;
+  margin-bottom: 4px;
+}
+
+.sharing-cycle {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* STUDENT CURRENT STATUS OVERVIEW */
+.status-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.status-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.status-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.status-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.status-value.paid {
+  color: #059669;
+}
+
+.status-value.due {
+  color: #dc2626;
+}
+
+/* ADMIN PAYMENT REQUEST CALLOUT */
+.payment-request-callout {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-request-callout.has-request {
+  border-left: 6px solid #4f46e5;
+  background: linear-gradient(to right, #f5f3ff 0%, #ffffff 100%);
+}
+
+.payment-request-callout.due-notice {
+  border-left: 6px solid #ef4444;
+  background: linear-gradient(to right, #fef2f2 0%, #ffffff 100%);
+}
+
+.callout-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.callout-info h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  color: #0f172a;
+}
+
+.callout-info p {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+}
+
+.callout-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-accept-pay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #059669;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+.btn-accept-pay:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.btn-notify-cash {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #4f46e5;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.btn-notify-cash:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+/* MONTHLY PAYMENT HISTORY SECTION */
+.payment-history-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.monthly-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.month-status-card {
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 2px solid;
+  transition: all 0.2s ease;
+}
+
+.month-status-card:hover {
+  transform: translateY(-2px);
+}
+
+/* GREEN CARD FOR PAID */
+.month-status-card.paid {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+/* RED CARD FOR DUE FEE */
+.month-status-card.due {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.month-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-status.paid {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.badge-status.due {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
+.month-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.fee-amount-block .fee-lbl {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.fee-amount-block .fee-val {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.month-status-card.paid .fee-val {
+  color: #059669;
+}
+
+.month-status-card.due .fee-val {
+  color: #dc2626;
+}
+
+.fee-date-block {
+  text-align: right;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.month-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.btn-download-receipt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #059669;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-download-receipt:hover {
+  background: #047857;
+}
+
+.btn-pay-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-pay-card:hover {
+  background: #b91c1c;
+}
+
+/* NOTIFICATION / ALERT MESSAGES */
+.fee-alert-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fee-alert-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .fee-title {
+    font-size: 1.8rem;
+  }
+  .callout-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .callout-actions {
+    width: 100%;
+  }
+  .btn-accept-pay, .btn-notify-cash {
+    width: 100%;
+    justify-content: center;
+  }
+}

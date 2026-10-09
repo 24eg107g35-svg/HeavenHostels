@@ -145,5 +145,7 @@ public final class ApiDtos {
             String floor,
             String wardenContact,
             String status) {}
+    public record AdminPaymentRequestDto(Long studentId, Integer month, Integer year) {}
 }
+
 

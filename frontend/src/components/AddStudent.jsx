@@ -36,13 +36,13 @@ export default function AddStudent({isstudent}) {
       // Auto-calculate AmountPerMonth based on Sharing type
       if (name === 'Sharing') {
         const amounts = {
-          '1': '7000',
-          '2': '8000',
-          '3': '6700',
-          '4': '6500',
-          '5': '6000'
+          '1': '7500',
+          '2': '7000',
+          '3': '6500',
+          '4': '6000',
+          '5': '5500'
         };
-        updated.AmountPerMonth = amounts[value] || '6000';
+        updated.AmountPerMonth = amounts[value] || '6500';
       }
       
       return updated;
@@ -157,12 +157,12 @@ export default function AddStudent({isstudent}) {
             className="form-select"
             placeholder="select Room type"
           >
-               <option value={''} >Select Room Type</option>
-            <option value={'1'} >1-sharing</option>
-            <option value={'2'}>2-sharing</option>
-            <option value={'3'}>3-sharing</option>
-            <option value={'4'}>4-sharing</option>
-            <option value={'5'}>5-sharing</option>
+               <option value={''} >Select Room Sharing</option>
+            <option value={'1'}>1-sharing (₹7,500/month)</option>
+            <option value={'2'}>2-sharing (₹7,000/month)</option>
+            <option value={'3'}>3-sharing (₹6,500/month)</option>
+            <option value={'4'}>4-sharing (₹6,000/month)</option>
+            <option value={'5'}>5-sharing (₹5,500/month)</option>
           </select>
         </label>
 

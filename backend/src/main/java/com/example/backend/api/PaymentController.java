@@ -67,7 +67,7 @@ public class PaymentController {
     @PostMapping("/pay-current")
     @PreAuthorize("hasRole('STUDENT')")
     public PaymentResponse payCurrentMonth(@AuthenticationPrincipal AuthenticatedUser principal) {
-        throw ApiException.conflict("Online payment is disabled. Pay the fee offline to the administrator.");
+        return payments.studentPayCurrent(account(principal));
     }
 
     @GetMapping("/student/{studentId}")

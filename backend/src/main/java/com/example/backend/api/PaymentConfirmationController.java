@@ -1,8 +1,13 @@
 package com.example.backend.api;
 
+import com.example.backend.api.dto.ApiDtos.AdminPaymentRequestDto;
 import com.example.backend.api.dto.ApiDtos.PaymentConfirmationDateRequest;
 import com.example.backend.api.dto.ApiDtos.PaymentConfirmationResponse;
+import com.example.backend.api.dto.ApiDtos.PaymentResponse;
+import com.example.backend.domain.UserAccount;
+import com.example.backend.repository.UserAccountRepository;
 import com.example.backend.security.AuthenticatedUser;
+import com.example.backend.service.ApiException;
 import com.example.backend.service.PaymentConfirmationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -26,9 +31,11 @@ import java.util.Map;
 @SecurityRequirement(name = "bearerAuth")
 public class PaymentConfirmationController {
     private final PaymentConfirmationService confirmations;
+    private final UserAccountRepository users;
 
-    public PaymentConfirmationController(PaymentConfirmationService confirmations) {
+    public PaymentConfirmationController(PaymentConfirmationService confirmations, UserAccountRepository users) {
         this.confirmations = confirmations;
+        this.users = users;
     }
 
     @PostMapping("/mine")
@@ -69,4 +76,30 @@ public class PaymentConfirmationController {
     public PaymentConfirmationResponse reject(@PathVariable Long id) {
         return confirmations.reject(id);
     }
+
+    @PostMapping("/admin/send")
+    @PreAuthorize("hasRole('ADMIN')")
+    public PaymentConfirmationResponse adminSend(@RequestBody AdminPaymentRequestDto request,
+                                                 @AuthenticationPrincipal AuthenticatedUser principal) {
+        return confirmations.adminSendPaymentRequest(request.studentId(), request.month(), request.year(), principal.email());
+    }
+
+    @PostMapping("/admin/send-all-unpaid")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<PaymentConfirmationResponse> adminSendAllUnpaid(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return confirmations.adminSendAllUnpaidRequests(principal.email());
+    }
+
+    @PostMapping("/accept/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public PaymentResponse acceptAndPay(@PathVariable Long id,
+                                       @AuthenticationPrincipal AuthenticatedUser principal) {
+        return confirmations.acceptAndPay(id, account(principal));
+    }
+
+    private UserAccount account(AuthenticatedUser principal) {
+        return users.findById(principal.id())
+                .orElseThrow(() -> ApiException.unauthorized("Account does not exist"));
+    }
 }
+

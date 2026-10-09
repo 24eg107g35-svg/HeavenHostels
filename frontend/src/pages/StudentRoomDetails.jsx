@@ -42,18 +42,18 @@ const StudentRoomDetails = () => {
     const roomTypes = [
         {
             type: "1 Sharing (Single Room)",
-            sharing: "Single",
+            sharing: "1 Sharing",
             capacity: 1,
-            price: "₹9,500 / month",
+            price: "₹7,500 / month",
             popular: false,
-            desc: "Maximum privacy with personal study lounge and attached private bathroom.",
-            amenities: ["Private Washroom", "AC / Cooler", "King Single Bed", "Ergonomic Desk", "Steel Wardrobe", "Balcony View"]
+            desc: "Maximum privacy with personal study desk, steel locker, and attached washroom.",
+            amenities: ["Private Room", "Attached Washroom", "King Single Bed", "Study Desk", "Steel Wardrobe", "Daily Cleaning"]
         },
         {
             type: "2 Sharing (Double Room)",
             sharing: "2 Sharing",
             capacity: 2,
-            price: "₹7,500 / month",
+            price: "₹7,000 / month",
             popular: true,
             desc: "Ideal balance of comfort and companionship with twin beds and dedicated workspaces.",
             amenities: ["Attached Washroom", "Twin Beds", "2x Study Tables", "2x Wardrobes", "High-Speed Wi-Fi", "Daily Cleaning"]
@@ -71,10 +71,19 @@ const StudentRoomDetails = () => {
             type: "4 Sharing (Economy Quad)",
             sharing: "4 Sharing",
             capacity: 4,
-            price: "₹5,200 / month",
+            price: "₹6,000 / month",
             popular: false,
-            desc: "Budget-friendly accommodation tailored for focused students and groups.",
-            amenities: ["Quad Setup", "Personal Lockers", "Shared Desks", "Ceiling Fans", "RO Water Access", "Housekeeping"]
+            desc: "Comfortable quad sharing accommodation tailored for focused students.",
+            amenities: ["Quad Setup", "Personal Lockers", "Study Desks", "Ceiling Fans", "RO Water Access", "Housekeeping"]
+        },
+        {
+            type: "5 Sharing (Community Room)",
+            sharing: "5 Sharing",
+            capacity: 5,
+            price: "₹5,500 / month",
+            popular: false,
+            desc: "Most budget-friendly accommodation option with full hostel amenities and community living.",
+            amenities: ["5x Beds", "Personal Lockers", "Shared Desks", "Housekeeping", "Wi-Fi & Geyser", "RO Water"]
         }
     ];
 

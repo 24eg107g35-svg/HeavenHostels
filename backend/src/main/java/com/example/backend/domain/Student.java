@@ -104,6 +104,8 @@ public class Student {
     public void setRoom(Room room) { this.room = room; this.roomNumber = room == null ? null : room.getRoomNumber(); }
     public void setStatus(StudentStatus status) { this.status = status; }
     public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
+    public void setAmountPerMonth(BigDecimal amountPerMonth) { this.amountPerMonth = amountPerMonth; }
+    public void setSharing(String sharing) { this.sharing = sharing; }
 
     public void updateProfile(String studentName, String email, String roomNumber, String sharing,
                               String collegeName, String courseNameAndYear, String mobileNumber,

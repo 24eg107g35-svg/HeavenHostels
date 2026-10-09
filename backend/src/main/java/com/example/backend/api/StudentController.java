@@ -17,6 +17,8 @@ import com.example.backend.service.StudentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -205,10 +207,15 @@ public class StudentController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Object> markPaid(@PathVariable Long id,
-                                       @RequestBody(required = false) Map<String, String> request,
+                                       @RequestBody(required = false) Map<String, Object> request,
                                        @AuthenticationPrincipal AuthenticatedUser principal) {
-        String dateValue = request == null ? null : request.get("paymentDate");
+        String dateValue = request == null ? null : (request.get("paymentDate") != null ? request.get("paymentDate").toString() : null);
         LocalDate date = dateValue == null || dateValue.isBlank() ? LocalDate.now() : LocalDate.parse(dateValue);
+        Integer month = request != null && request.get("month") != null ? Integer.parseInt(request.get("month").toString()) : null;
+        Integer year = request != null && request.get("year") != null ? Integer.parseInt(request.get("year").toString()) : null;
+        if (month != null && year != null) {
+            return Map.of("data", payments.markMonthPaid(id, month, year, date, account(principal)));
+        }
         return Map.of("data", payments.markCurrentMonthPaid(id, date, account(principal)));
     }
 
@@ -224,9 +231,32 @@ public class StudentController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, String> markUnpaid(@PathVariable Long id,
+                                         @RequestBody(required = false) Map<String, Object> request,
                                          @AuthenticationPrincipal AuthenticatedUser principal) {
-        payments.markCurrentMonthUnpaid(id, account(principal));
+        Integer month = request != null && request.get("month") != null ? Integer.parseInt(request.get("month").toString()) : null;
+        Integer year = request != null && request.get("year") != null ? Integer.parseInt(request.get("year").toString()) : null;
+        if (month != null && year != null) {
+            payments.markMonthUnpaid(id, month, year, account(principal));
+        } else {
+            payments.markCurrentMonthUnpaid(id, account(principal));
+        }
         return Map.of("message", "Payment status updated");
+    }
+
+    @PutMapping("/{id}/fee")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StudentResponse updateFee(@PathVariable Long id,
+                                     @RequestBody(required = false) Map<String, Object> body,
+                                     @AuthenticationPrincipal AuthenticatedUser principal) {
+        BigDecimal amount = null;
+        if (body != null && body.get("amount") != null) {
+            try {
+                amount = new BigDecimal(body.get("amount").toString());
+            } catch (Exception ignored) {}
+        }
+        String sharing = body != null && body.get("sharing") != null ? body.get("sharing").toString() : null;
+        return students.updateStudentFee(id, amount, sharing, account(principal));
     }
 
     @GetMapping("/paymenthistroy")

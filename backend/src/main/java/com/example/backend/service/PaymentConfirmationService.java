@@ -8,6 +8,7 @@ import com.example.backend.domain.PaymentConfirmationStatus;
 import com.example.backend.domain.Student;
 import com.example.backend.repository.PaymentConfirmationRequestRepository;
 import com.example.backend.repository.StudentRepository;
+import com.example.backend.domain.UserAccount;
 import com.example.backend.repository.UserAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +22,16 @@ public class PaymentConfirmationService {
     private final StudentRepository students;
     private final UserAccountRepository users;
     private final PaymentService payments;
+    private final StudentNotificationService notifications;
 
     public PaymentConfirmationService(PaymentConfirmationRequestRepository requests,
                                       StudentRepository students, UserAccountRepository users,
-                                      PaymentService payments) {
+                                      PaymentService payments, StudentNotificationService notifications) {
         this.requests = requests;
         this.students = students;
         this.users = users;
         this.payments = payments;
+        this.notifications = notifications;
     }
 
     @Transactional
@@ -96,6 +99,73 @@ public class PaymentConfirmationService {
         PaymentConfirmationRequest request = findPendingForUpdate(requestId);
         request.reject();
         return view(request);
+    }
+
+    @Transactional
+    public PaymentConfirmationResponse adminSendPaymentRequest(Long studentId, Integer month, Integer year, String adminEmail) {
+        Student student = students.findByIdForUpdate(studentId)
+                .orElseThrow(() -> ApiException.notFound("Student not found"));
+        LocalDate today = LocalDate.now();
+        int m = month != null ? month : today.getMonthValue();
+        int y = year != null ? year : today.getYear();
+
+        if (payments.isPaid(studentId, y, m)) {
+            throw ApiException.conflict("Payment for this month is already marked Paid");
+        }
+
+        PaymentConfirmationRequest existing = requests
+                .findFirstByStudentIdAndMonthAndYearAndStatusOrderByRequestedAtDesc(
+                        studentId, m, y, PaymentConfirmationStatus.PENDING)
+                .orElse(null);
+        if (existing != null) {
+            return view(existing);
+        }
+
+        PaymentConfirmationRequest saved = requests.save(new PaymentConfirmationRequest(student, m, y));
+        notifications.createForStudent(student, "Hostel Fee Payment Request",
+                "Administrator has requested payment for " + m + "/" + y + " (₹" + student.getAmountPerMonth() + "). Please accept and pay.");
+        return view(saved);
+    }
+
+    @Transactional
+    public List<PaymentConfirmationResponse> adminSendAllUnpaidRequests(String adminEmail) {
+        LocalDate today = LocalDate.now();
+        int m = today.getMonthValue();
+        int y = today.getYear();
+        List<Student> activeStudents = students.findByStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+        return activeStudents.stream()
+                .filter(s -> !payments.isPaid(s.getId(), y, m))
+                .map(s -> {
+                    PaymentConfirmationRequest pending = requests
+                            .findFirstByStudentIdAndMonthAndYearAndStatusOrderByRequestedAtDesc(
+                                    s.getId(), m, y, PaymentConfirmationStatus.PENDING)
+                            .orElseGet(() -> {
+                                PaymentConfirmationRequest req = requests.save(new PaymentConfirmationRequest(s, m, y));
+                                notifications.createForStudent(s, "Hostel Fee Payment Request",
+                                        "Administrator has requested fee payment for " + m + "/" + y + " (₹" + s.getAmountPerMonth() + "). Please accept and pay in Fee Management.");
+                                return req;
+                            });
+                    return view(pending);
+                })
+                .toList();
+    }
+
+    @Transactional
+    public com.example.backend.api.dto.ApiDtos.PaymentResponse acceptAndPay(Long requestId, UserAccount actor) {
+        PaymentConfirmationRequest request = findPendingForUpdate(requestId);
+        Student student = request.getStudent();
+        if (student.getAccount() == null || !student.getAccount().getId().equals(actor.getId())) {
+            throw ApiException.forbidden("You can only accept payment requests addressed to your account");
+        }
+        LocalDate today = LocalDate.now();
+        var admin = users.findByEmailIgnoreCase(actor.getEmail()).orElse(actor);
+        var payment = payments.create(new com.example.backend.api.dto.ApiDtos.PaymentRequest(
+                student.getId(), student.getAmountPerMonth(),
+                request.getMonth(), request.getYear(), today, "ONLINE-" + java.util.UUID.randomUUID().toString().substring(0, 8)), admin);
+        request.complete(payment.id());
+        notifications.createForStudent(student, "Payment Accepted & Confirmed",
+                "You have accepted the payment request and completed payment of ₹" + student.getAmountPerMonth() + " for " + request.getMonth() + "/" + request.getYear() + ".");
+        return payment;
     }
 
     private PaymentConfirmationRequest findPendingForUpdate(Long requestId) {

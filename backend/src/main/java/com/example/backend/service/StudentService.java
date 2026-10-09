@@ -252,6 +252,24 @@ public class StudentService {
     }
 
     @Transactional
+    public StudentResponse updateStudentFee(Long studentId, BigDecimal amount, String sharing, UserAccount actor) {
+        Student student = students.findByIdForUpdate(studentId)
+                .orElseThrow(() -> ApiException.notFound("Student not found"));
+        if (amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
+            student.setAmountPerMonth(amount);
+        }
+        if (sharing != null && !sharing.isBlank()) {
+            student.setSharing(sharing);
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+                student.setAmountPerMonth(PaymentService.defaultPriceForSharing(sharing));
+            }
+        }
+        Student saved = students.save(student);
+        audit.record(actor.getEmail(), "ADMIN_UPDATED_STUDENT_FEE", "Student", saved.getId());
+        return view(saved);
+    }
+
+    @Transactional
     public StudentResponse saveLegacyProfile(StudentRequest request, UserAccount actor) {
         if (request.roomNumber() != null && !request.roomNumber().isBlank()
                 && rooms.findByRoomNumberIgnoreCase(request.roomNumber().trim()).isEmpty()) {

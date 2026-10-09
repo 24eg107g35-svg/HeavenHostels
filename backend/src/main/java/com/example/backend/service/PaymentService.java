@@ -132,6 +132,59 @@ public class PaymentService {
         return ownHistoryForAccountId(actor.getId());
     }
 
+    @Transactional
+    public PaymentResponse studentPayCurrent(UserAccount actor) {
+        Student student = students.findByAccountIdForUpdate(actor.getId())
+                .orElseThrow(() -> ApiException.notFound("Student profile not found"));
+        if (!student.isActive()) {
+            throw paymentRejected(HttpStatus.CONFLICT, "Only active students can make payments");
+        }
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        int year = today.getYear();
+        if (payments.existsByStudentIdAndYearAndMonthAndStatus(student.getId(), year, month, PaymentStatus.PAID)) {
+            throw paymentRejected(HttpStatus.CONFLICT, "Payment for current month is already completed");
+        }
+        BigDecimal rawAmount = student.getAmountPerMonth();
+        final BigDecimal finalAmount = (rawAmount == null || rawAmount.compareTo(BigDecimal.ZERO) <= 0)
+                ? defaultPriceForSharing(student.getSharing()) : rawAmount;
+
+        Payment payment = payments.findByStudentIdAndYearAndMonthAndStatus(
+                        student.getId(), year, month, PaymentStatus.UNPAID)
+                .orElseGet(() -> new Payment(student, finalAmount, month, year, today, PaymentStatus.PAID,
+                        receiptNumber(), "ONLINE-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase(Locale.ROOT)));
+        payment.setStatus(PaymentStatus.PAID);
+        payment.setDate(today);
+        payment.setAmount(finalAmount);
+        Payment saved = payments.saveAndFlush(payment);
+
+        paymentConfirmationRequests.findFirstByStudentIdAndMonthAndYearAndStatusOrderByRequestedAtDesc(
+                        student.getId(), month, year, PaymentConfirmationStatus.PENDING)
+                .ifPresent(confirmation -> confirmation.complete(saved.getId()));
+
+        audit.record(actor.getEmail(), "STUDENT_ONLINE_PAYMENT", "Payment", saved.getId());
+        notifications.createForStudent(student, "Payment Successful",
+                "Your payment of ₹" + saved.getAmount().toPlainString()
+                        + " for " + saved.getMonth() + "/" + saved.getYear() + " is confirmed! Status: Paid.");
+        events.publishEvent(new PaymentReceiptEvent(saved.getId(), student.getEmail(), saved.getReceiptNumber()));
+        log.info("Student online payment confirmed with receipt {}", saved.getReceiptNumber());
+        return view(saved);
+    }
+
+    public static BigDecimal defaultPriceForSharing(String sharing) {
+        if (sharing == null) return new BigDecimal("6500");
+        String clean = sharing.replaceAll("[^0-9]", "");
+        return switch (clean) {
+            case "1" -> new BigDecimal("7500");
+            case "2" -> new BigDecimal("7000");
+            case "3" -> new BigDecimal("6500");
+            case "4" -> new BigDecimal("6000");
+            case "5" -> new BigDecimal("5500");
+            default -> new BigDecimal("6500");
+        };
+    }
+
+
     @Transactional(readOnly = true)
     public List<PaymentResponse> ownHistoryForAccountId(Long accountId) {
         Student student = students.findByAccountId(accountId)
@@ -192,14 +245,36 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse markCurrentMonthPaid(Long studentId, LocalDate date, UserAccount actor) {
+        LocalDate today = LocalDate.now();
+        return markMonthPaid(studentId, today.getMonthValue(), today.getYear(), date, actor);
+    }
+
+    @Transactional
+    public PaymentResponse markMonthPaid(Long studentId, int month, int year, LocalDate date, UserAccount actor) {
         Student student = findStudent(studentId);
         LocalDate today = LocalDate.now();
-        if (date == null || date.isAfter(today)) {
+        LocalDate payDate = (date == null) ? today : date;
+        if (payDate.isAfter(today)) {
             throw ApiException.badRequest("Payment date must be today or earlier");
         }
         PaymentRequest request = new PaymentRequest(studentId, student.getAmountPerMonth(),
-                today.getMonthValue(), today.getYear(), date, null);
+                month, year, payDate, null);
         return create(request, actor);
+    }
+
+    @Transactional
+    public void markMonthUnpaid(Long studentId, int month, int year, UserAccount actor) {
+        Student student = findStudent(studentId);
+        LocalDate today = LocalDate.now();
+        payments.findByStudentIdAndYearAndMonthAndStatus(studentId, year, month, PaymentStatus.PAID)
+                .ifPresent(payment -> {
+                    payment.setStatus(PaymentStatus.CANCELLED);
+                    ensureUnpaid(student, year, month, today);
+                    notifications.createForStudent(student, "Fee status updated",
+                            "Your fee for " + month + "/" + year
+                                    + " was marked unpaid by the administrator.");
+                    audit.record(actor.getEmail(), "PAYMENT_CANCELLED", "Payment", payment.getId());
+                });
     }
 
     @Transactional
@@ -283,9 +358,15 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public boolean isPaidThisMonth(Long studentId) {
         LocalDate today = LocalDate.now();
-        return payments.existsByStudentIdAndYearAndMonthAndStatus(
-                studentId, today.getYear(), today.getMonthValue(), PaymentStatus.PAID);
+        return isPaid(studentId, today.getYear(), today.getMonthValue());
     }
+
+    @Transactional(readOnly = true)
+    public boolean isPaid(Long studentId, int year, int month) {
+        return payments.existsByStudentIdAndYearAndMonthAndStatus(
+                studentId, year, month, PaymentStatus.PAID);
+    }
+
 
     private Student findStudent(Long id) {
         return students.findById(id).orElseThrow(() -> ApiException.notFound("Student not found"));
