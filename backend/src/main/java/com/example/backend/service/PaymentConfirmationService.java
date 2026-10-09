@@ -13,6 +13,7 @@ import com.example.backend.repository.UserAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,7 +38,14 @@ public class PaymentConfirmationService {
     @Transactional
     public PaymentConfirmationResponse requestCurrentPayment(Long accountId) {
         Student student = students.findByAccountIdForUpdate(accountId)
+                .or(() -> {
+                    var u = users.findById(accountId);
+                    return u.flatMap(userAccount -> students.findByEmailIgnoreCaseForUpdate(userAccount.getEmail()));
+                })
                 .orElseThrow(() -> ApiException.notFound("Student profile not found"));
+        if (student.getAccount() == null) {
+            users.findById(accountId).ifPresent(student::setAccount);
+        }
         if (!student.isActive()) {
             throw ApiException.conflict("Only active students can request payment confirmation");
         }
@@ -113,6 +121,18 @@ public class PaymentConfirmationService {
             throw ApiException.conflict("Payment for this month is already marked Paid");
         }
 
+        // Activate student and ensure amount & account
+        if (student.getStatus() != com.example.backend.domain.StudentStatus.INACTIVE) {
+            student.setStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+        }
+        if (student.getAccount() == null && student.getEmail() != null) {
+            users.findByEmailIgnoreCase(student.getEmail()).ifPresent(student::setAccount);
+        }
+        if (student.getAmountPerMonth() == null || student.getAmountPerMonth().signum() <= 0) {
+            student.setAmountPerMonth(PaymentService.defaultPriceForSharing(student.getSharing()));
+        }
+        students.save(student);
+
         PaymentConfirmationRequest existing = requests
                 .findFirstByStudentIdAndMonthAndYearAndStatusOrderByRequestedAtDesc(
                         studentId, m, y, PaymentConfirmationStatus.PENDING)
@@ -132,10 +152,20 @@ public class PaymentConfirmationService {
         LocalDate today = LocalDate.now();
         int m = today.getMonthValue();
         int y = today.getYear();
-        List<Student> activeStudents = students.findByStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+        List<Student> activeStudents = students.findAllByOrderByStudentNameAsc().stream()
+                .filter(s -> s.getStatus() != com.example.backend.domain.StudentStatus.INACTIVE)
+                .toList();
         return activeStudents.stream()
                 .filter(s -> !payments.isPaid(s.getId(), y, m))
                 .map(s -> {
+                    s.setStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+                    if (s.getAccount() == null && s.getEmail() != null) {
+                        users.findByEmailIgnoreCase(s.getEmail()).ifPresent(s::setAccount);
+                    }
+                    if (s.getAmountPerMonth() == null || s.getAmountPerMonth().signum() <= 0) {
+                        s.setAmountPerMonth(PaymentService.defaultPriceForSharing(s.getSharing()));
+                    }
+                    students.save(s);
                     PaymentConfirmationRequest pending = requests
                             .findFirstByStudentIdAndMonthAndYearAndStatusOrderByRequestedAtDesc(
                                     s.getId(), m, y, PaymentConfirmationStatus.PENDING)
@@ -155,16 +185,33 @@ public class PaymentConfirmationService {
         PaymentConfirmationRequest request = findPendingForUpdate(requestId);
         Student student = request.getStudent();
         if (student.getAccount() == null || !student.getAccount().getId().equals(actor.getId())) {
-            throw ApiException.forbidden("You can only accept payment requests addressed to your account");
+            if (student.getEmail() != null && student.getEmail().equalsIgnoreCase(actor.getEmail())) {
+                student.setAccount(actor);
+            } else if (student.getAccount() == null) {
+                student.setAccount(actor);
+            } else {
+                throw ApiException.forbidden("You can only accept payment requests addressed to your account");
+            }
         }
+        // Activate student
+        if (student.getStatus() != com.example.backend.domain.StudentStatus.ACTIVE) {
+            student.setStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+        }
+        BigDecimal amount = student.getAmountPerMonth();
+        if (amount == null || amount.signum() <= 0) {
+            amount = PaymentService.defaultPriceForSharing(student.getSharing());
+            student.setAmountPerMonth(amount);
+        }
+        students.save(student);
+
         LocalDate today = LocalDate.now();
         var admin = users.findByEmailIgnoreCase(actor.getEmail()).orElse(actor);
         var payment = payments.create(new com.example.backend.api.dto.ApiDtos.PaymentRequest(
-                student.getId(), student.getAmountPerMonth(),
+                student.getId(), amount,
                 request.getMonth(), request.getYear(), today, "ONLINE-" + java.util.UUID.randomUUID().toString().substring(0, 8)), admin);
         request.complete(payment.id());
         notifications.createForStudent(student, "Payment Accepted & Confirmed",
-                "You have accepted the payment request and completed payment of ₹" + student.getAmountPerMonth() + " for " + request.getMonth() + "/" + request.getYear() + ".");
+                "You have accepted the payment request and completed payment of ₹" + amount + " for " + request.getMonth() + "/" + request.getYear() + ".");
         return payment;
     }
 

@@ -58,7 +58,13 @@ public class PaymentService {
     public PaymentResponse create(PaymentRequest request, UserAccount actor) {
         Student student = students.findByIdForUpdate(request.studentId())
                 .orElseThrow(() -> ApiException.notFound("Student not found"));
-        if (!student.isActive()) throw paymentRejected(HttpStatus.CONFLICT, "Only active students can receive payments");
+        if (student.getStatus() == com.example.backend.domain.StudentStatus.INACTIVE) {
+            throw paymentRejected(HttpStatus.CONFLICT, "Only active students can receive payments");
+        }
+        if (student.getStatus() != com.example.backend.domain.StudentStatus.ACTIVE) {
+            student.setStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+            students.save(student);
+        }
         if (request.month() < 1 || request.month() > 12 || request.year() < 2000 || request.year() > 2200) {
             throw paymentRejected(HttpStatus.BAD_REQUEST, "Payment month or year is invalid");
         }
@@ -66,9 +72,12 @@ public class PaymentService {
         if (paymentDate.isAfter(LocalDate.now())) {
             throw paymentRejected(HttpStatus.BAD_REQUEST, "Payment date cannot be in the future");
         }
-        BigDecimal dueAmount = student.getAmountPerMonth();
-        if (dueAmount == null || dueAmount.signum() <= 0) {
-            throw paymentRejected(HttpStatus.CONFLICT, "Student has no valid monthly amount configured");
+        BigDecimal rawDue = student.getAmountPerMonth();
+        final BigDecimal dueAmount = (rawDue == null || rawDue.signum() <= 0)
+                ? defaultPriceForSharing(student.getSharing()) : rawDue;
+        if (rawDue == null || rawDue.compareTo(dueAmount) != 0) {
+            student.setAmountPerMonth(dueAmount);
+            students.save(student);
         }
         if (request.amount().compareTo(dueAmount) != 0) {
             throw paymentRejected(HttpStatus.BAD_REQUEST, "Payment amount must match the student's configured monthly amount");
@@ -135,9 +144,18 @@ public class PaymentService {
     @Transactional
     public PaymentResponse studentPayCurrent(UserAccount actor) {
         Student student = students.findByAccountIdForUpdate(actor.getId())
+                .or(() -> students.findByEmailIgnoreCaseForUpdate(actor.getEmail()))
                 .orElseThrow(() -> ApiException.notFound("Student profile not found"));
-        if (!student.isActive()) {
+        if (student.getAccount() == null) {
+            student.setAccount(actor);
+            students.save(student);
+        }
+        if (student.getStatus() == com.example.backend.domain.StudentStatus.INACTIVE) {
             throw paymentRejected(HttpStatus.CONFLICT, "Only active students can make payments");
+        }
+        if (student.getStatus() != com.example.backend.domain.StudentStatus.ACTIVE) {
+            student.setStatus(com.example.backend.domain.StudentStatus.ACTIVE);
+            students.save(student);
         }
         LocalDate today = LocalDate.now();
         int month = today.getMonthValue();

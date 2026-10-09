@@ -245,9 +245,12 @@ public class StudentService {
             }
             if (request.active() != null) {
                 student.setStatus(request.active() ? StudentStatus.ACTIVE : StudentStatus.INACTIVE);
-            } else if (student.getStatus() == StudentStatus.PENDING) {
+            } else if (student.getStatus() != StudentStatus.INACTIVE) {
                 student.setStatus(StudentStatus.ACTIVE);
             }
+        }
+        if (student.getAmountPerMonth() == null || student.getAmountPerMonth().signum() <= 0) {
+            student.setAmountPerMonth(PaymentService.defaultPriceForSharing(student.getSharing()));
         }
         Student saved = students.save(student);
         if (saved.isActive()) ensureCurrentUnpaid(saved);
@@ -268,6 +271,9 @@ public class StudentService {
             if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
                 student.setAmountPerMonth(PaymentService.defaultPriceForSharing(sharing));
             }
+        }
+        if (student.getStatus() != StudentStatus.INACTIVE) {
+            student.setStatus(StudentStatus.ACTIVE);
         }
         Student saved = students.save(student);
         audit.record(actor.getEmail(), "ADMIN_UPDATED_STUDENT_FEE", "Student", saved.getId());
@@ -313,13 +319,10 @@ public class StudentService {
         Room room = student.getRoom();
         if (roomNumber != null && !roomNumber.isBlank()
                 && (room == null || !room.getRoomNumber().equalsIgnoreCase(roomNumber))) {
-            Room roomSummary = rooms.findByRoomNumberIgnoreCase(roomNumber)
-                    .orElseThrow(() -> ApiException.badRequest("Create the room before assigning a student"));
-            room = rooms.findByIdForUpdate(roomSummary.getId()).orElseThrow(() ->
-                    ApiException.notFound("Room not found"));
-            if (!room.isActive() || students.countByRoomId(room.getId()) >= room.getCapacity()) {
-                throw ApiException.conflict("Room has no available beds");
-            }
+            Room roomSummary = rooms.findByRoomNumberIgnoreCase(roomNumber.trim())
+                    .orElseGet(() -> rooms.save(new Room(roomNumber.trim(), parseCapacity(student.getSharing()),
+                            student.getAmountPerMonth() != null ? student.getAmountPerMonth() : PaymentService.defaultPriceForSharing(student.getSharing()))));
+            room = rooms.findByIdForUpdate(roomSummary.getId()).orElse(roomSummary);
         }
         student.updateProfile(request.studentName().trim(), email, roomNumber,
                 request.sharing() == null ? student.getSharing() : request.sharing(),
@@ -333,6 +336,8 @@ public class StudentService {
         if (room != student.getRoom()) student.setRoom(room);
         if (request.active() != null) {
             student.setStatus(request.active() ? StudentStatus.ACTIVE : StudentStatus.INACTIVE);
+        } else if (student.getStatus() != StudentStatus.INACTIVE) {
+            student.setStatus(StudentStatus.ACTIVE);
         }
         Student saved = students.save(student);
         if (saved.isActive()) ensureCurrentUnpaid(saved);

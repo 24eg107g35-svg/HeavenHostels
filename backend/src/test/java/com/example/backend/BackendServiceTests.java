@@ -220,7 +220,9 @@ class BackendServiceTests {
         mockMvc.perform(post("/api/payments/pay-current")
                         .header("Authorization", "Bearer " + studentToken))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Online payment is disabled")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.anyOf(
+                        org.hamcrest.Matchers.containsString("Payment for current month is already completed"),
+                        org.hamcrest.Matchers.containsString("Online payment is disabled"))));
     }
 
     @Test

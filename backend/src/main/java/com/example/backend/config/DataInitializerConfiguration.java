@@ -64,14 +64,38 @@ public class DataInitializerConfiguration {
                 log.info("Successfully seeded 14 hostel rooms across 1st, 2nd, and 3rd floors.");
             }
 
-            // 2. Link existing students to their Room entity if unlinked
+            // 2. Link existing students to their Room entity and UserAccount, ensure ACTIVE status and valid fees
             students.findAll().forEach(student -> {
+                boolean changed = false;
+                if (student.getStatus() != StudentStatus.INACTIVE && student.getStatus() != StudentStatus.ACTIVE) {
+                    student.setStatus(StudentStatus.ACTIVE);
+                    changed = true;
+                }
+                if (student.getAccount() == null && student.getEmail() != null) {
+                    var acc = users.findByEmailIgnoreCase(student.getEmail().trim());
+                    if (acc.isPresent()) {
+                        student.setAccount(acc.get());
+                        changed = true;
+                    }
+                }
+                if (student.getAmountPerMonth() == null || student.getAmountPerMonth().signum() <= 0) {
+                    student.setAmountPerMonth(new BigDecimal("6500.00"));
+                    changed = true;
+                }
+                if (student.getSharing() == null || student.getSharing().isBlank()) {
+                    student.setSharing("3 Sharing");
+                    changed = true;
+                }
                 if (student.getRoom() == null && student.getRoomNumber() != null && !student.getRoomNumber().isBlank()) {
-                    rooms.findByRoomNumberIgnoreCase(student.getRoomNumber().trim()).ifPresent(room -> {
-                        student.setRoom(room);
-                        students.save(student);
-                        log.info("Linked student {} to room {}", student.getStudentName(), room.getRoomNumber());
-                    });
+                    var r = rooms.findByRoomNumberIgnoreCase(student.getRoomNumber().trim());
+                    if (r.isPresent()) {
+                        student.setRoom(r.get());
+                        changed = true;
+                        log.info("Linked student {} to room {}", student.getStudentName(), r.get().getRoomNumber());
+                    }
+                }
+                if (changed) {
+                    students.save(student);
                 }
             });
 
