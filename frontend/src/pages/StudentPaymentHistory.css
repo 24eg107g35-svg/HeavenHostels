@@ -1,0 +1,192 @@
+/* StudentPaymentHistory.css */
+/* Premium responsive design for the payment history page */
+
+/* Root container – fills viewport height, applies subtle gradient background */
+.student-payment-history {
+  margin-top: 45px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, hsl(210, 30%, 98%), hsl(210, 20%, 94%));
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Centered content wrapper with max width and padding */
+.content-wrapper {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  width: 100%;
+}
+
+/* Large heading – uses gradient text for premium feel */
+.page-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(90deg, hsl(260, 80%, 55%), hsl(340, 70%, 55%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Table container – enable horizontal scroll on small screens */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  background: white;
+}
+
+.payment-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px; /* ensures comfortable spacing on desktop */
+}
+
+.payment-table th,
+.payment-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.payment-table th {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.payment-table tbody tr:hover {
+  background: hsla(210, 15%, 95%, 0.5);
+}
+
+/* Action button – only an icon, no default button styling */
+.download-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-blue-600);
+  padding: 0.25rem;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.download-btn:hover {
+  color: var(--color-blue-800);
+  transform: translateY(-2px);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 1rem 0.5rem;
+  }
+  .page-title {
+    font-size: 1.75rem;
+  }
+  .payment-table th,
+  .payment-table td {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Dark mode support – respects user preference */
+@media (prefers-color-scheme: dark) {
+  .student-payment-history {
+    background: linear-gradient(135deg, hsl(210, 20%, 12%), hsl(210, 20%, 18%));
+    color: hsl(0, 0%, 90%);
+  }
+  .table-container {
+    background: hsl(210, 20%, 22%);
+    box-shadow: none;
+  }
+  .payment-table th {
+    background: hsl(260, 50%, 30%);
+  }
+  .payment-table tbody tr:hover {
+    background: hsla(210, 15%, 30%, 0.5);
+  }
+  .download-btn {
+    color: hsl(200, 70%, 60%);
+  }
+  .download-btn:hover {
+    color: hsl(200, 70%, 80%);
+  }
+}
+
+/* Status Badge Styles */
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.paid {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.status-badge.Paid {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.status-badge.unpaid {
+  background-color: #fee2e2;
+  color: #7f1d1d;
+  border: 1px solid #fca5a5;
+}
+
+.status-badge.Unpaid {
+  background-color: #fee2e2;
+  color: #7f1d1d;
+  border: 1px solid #fca5a5;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.status-badge.Pending {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-badge.paid {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+  }
+
+  .status-badge.unpaid {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+  }
+
+  .status-badge.pending {
+    background-color: rgba(251, 191, 36, 0.2);
+    color: #fcd34d;
+  }
+}
+
+.no-payments {
+  text-align: center;
+  padding: 2rem !important;
+  color: var(--color-gray-500);
+  font-weight: 500;
+  font-style: italic;
+}

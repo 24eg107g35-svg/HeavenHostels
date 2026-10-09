@@ -1,0 +1,205 @@
+.fee-status-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+}
+
+.fee-status-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 80px auto 0;
+    flex: 1;
+    width: 100%;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
+.table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.fee-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.fee-table th,
+.fee-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.fee-table th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.fee-table td {
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.fee-table tr:hover {
+    background-color: #f8fafc;
+}
+
+.fee-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Sticky Columns for Mobile Readability */
+.sticky-col {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 20;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.fee-table th.sticky-col {
+    background-color: #f1f5f9;
+    z-index: 30;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    min-width: 90px;
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.status-badge.paid {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.status-badge.unpaid {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.status-badge.future {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+}
+
+.status-icon {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+}
+
+.payment-date {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+/* Specific Column Widths */
+.col-sno {
+    width: 50px;
+}
+
+.col-name {
+    min-width: 180px;
+    text-align: left !important;
+}
+
+.col-room {
+    min-width: 80px;
+}
+
+.col-month {
+    min-width: 110px;
+}
+
+/* Loading State */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .fee-status-container {
+        padding: 1rem;
+        margin-top: 60px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        min-width: 80px;
+    }
+}

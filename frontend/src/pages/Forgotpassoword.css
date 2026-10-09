@@ -1,0 +1,82 @@
+/* Forgotpassoword.css */
+
+/* Custom normal CSS to ensure absolute structural separation and elegant styling */
+
+.fp-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.fp-input-box {
+  width: 100%;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem; /* 8px */
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  box-sizing: border-box; /* strictly prevent overflow */
+}
+
+.fp-input-box:focus:not(:disabled) {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  outline: none;
+}
+
+.fp-input-box:disabled {
+  background-color: #f3f4f6; /* gray-100 */
+  color: #9ca3af; /* gray-400 */
+  cursor: not-allowed;
+  border-color: #e5e7eb; /* gray-200 */
+}
+
+/* Block buttons that stay securely below inputs */
+.fp-action-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.fp-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Specific button variants */
+.btn-primary { 
+  background-color: #2563eb; 
+}
+.btn-primary:hover:not(:disabled) { 
+  background-color: #1d4ed8; 
+  box-shadow: 0 4px 12px rgba(37,99,235,0.25); 
+  transform: translateY(-2px); 
+}
+
+.btn-success { 
+  background-color: #10b981; 
+}
+.btn-success:hover:not(:disabled) { 
+  background-color: #059669; 
+  box-shadow: 0 4px 12px rgba(16,185,129,0.25); 
+  transform: translateY(-2px); 
+}
+
+.btn-indigo { 
+  background-color: #4f46e5; 
+}
+.btn-indigo:hover:not(:disabled) { 
+  background-color: #4338ca; 
+  box-shadow: 0 4px 12px rgba(79,70,229,0.25); 
+  transform: translateY(-2px); 
+}
