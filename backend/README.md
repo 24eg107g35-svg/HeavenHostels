@@ -192,7 +192,7 @@ Optional settings:
 | `JWT_ISSUER` | `hostel-management` | JWT issuer |
 | `JWT_EXPIRATION_MINUTES` | `30` | Access token lifetime, allowed 5–1440 |
 | `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` | unset | Optional first admin; password minimum 8 characters |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated exact frontend origins |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:3000,http://localhost:*,http://127.0.0.1:*` | Comma-separated frontend origins or origin patterns |
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | unset / `587` | SMTP for OTP and post-payment email |
 | `MAIL_SMTP_AUTH`, `MAIL_SMTP_STARTTLS` | `true` | SMTP transport options |
 | `OTP_EXPIRATION_MINUTES` | `10` | OTP lifetime |
