@@ -1,0 +1,14 @@
+target/
+*.jar
+*.war
+.git/
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+*.iml
+.DS_Store
+*.log
+.env
+.env.local
+HELP.md
