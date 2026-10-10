@@ -49,7 +49,7 @@ public class JwtService {
         } else {
             this.keyBytes = raw;
         }
-        if (expirationMinutes < 5 || expirationMinutes > 1440) {
+        if ( expirationMinutes < 5 || expirationMinutes > 1440) {
             throw new IllegalStateException("JWT_EXPIRATION_MINUTES must be between 5 and 1440");
         }
     }
