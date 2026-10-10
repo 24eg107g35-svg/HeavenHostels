@@ -52,7 +52,7 @@ EXPOSE 8080
 
 # Health check to ensure Spring Boot is up and responding
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:${SERVER_PORT}/v3/api-docs || exit 1
+    CMD curl -f http://localhost:${PORT:-${SERVER_PORT:-8080}}/v3/api-docs || exit 1
 
 # Launch the application
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
