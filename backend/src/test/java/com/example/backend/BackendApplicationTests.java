@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		"spring.datasource.username=sa",
 		"spring.datasource.password=",
 		"spring.jpa.hibernate.ddl-auto=create-drop",
+		"spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
 		"spring.flyway.enabled=false",
 		"app.jwt.secret=integration-test-only-secret-with-at-least-32-chars",
 		"app.bootstrap-admin.email=",
